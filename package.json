@@ -1,0 +1,61 @@
+{
+  "name": "appium-wincore-java-bridge",
+  "version": "1.0.0",
+  "description": "Java Access Bridge (Swing / AWT) UI-tree bridge for appium-wincore-driver, as an installable Appium plugin",
+  "keywords": [
+    "appium",
+    "plugin",
+    "desktop",
+    "windows",
+    "java",
+    "swing",
+    "awt",
+    "jab",
+    "automation",
+    "verisoft"
+  ],
+  "main": "build/lib/index.js",
+  "files": [
+    "build/lib/**/*",
+    "native/plugin/**/*",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "build:agent": "cd java-agent && build.bat",
+    "build:plugin": "dotnet publish csharp/WincoreJavaBridge/WincoreJavaBridge.csproj -c Release -o native/plugin/ && node scripts/assemble-native.js",
+    "build:all": "npm run build:agent && npm run build:plugin && npm run build",
+    "watch": "tsc -b --watch",
+    "lint": "eslint .",
+    "test:e2e": "npx vitest run --config vitest.e2e.config.ts"
+  },
+  "author": "Automate The Planet",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/y-schwab/appium-wincore-java-bridge.git"
+  },
+  "peerDependencies": {
+    "appium": "^3.0.0-rc.2"
+  },
+  "dependencies": {
+    "@appium/base-plugin": "^3.3.3"
+  },
+  "appium": {
+    "pluginName": "wincore-java-bridge",
+    "mainClass": "JavaBridgePlugin"
+  },
+  "devDependencies": {
+    "@appium/eslint-config-appium-ts": "^2.0.3",
+    "@appium/tsconfig": "^1.1.0",
+    "@appium/types": "^1.1.0",
+    "@types/node": "^24.8.1",
+    "appium": "^3.0.0-rc.2",
+    "eslint": "^9.38.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.1",
+    "vitest": "^2.1.0",
+    "webdriverio": "^9.30.1"
+  }
+}

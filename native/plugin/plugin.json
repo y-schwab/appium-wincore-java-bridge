@@ -1,0 +1,6 @@
+{
+  "name": "java-bridge",
+  "entry": "WincoreJavaBridge.dll",
+  "type": "Wincore.JavaBridge.Plugin",
+  "sdkVersion": "1.0.0"
+}
