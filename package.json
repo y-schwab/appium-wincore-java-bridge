@@ -28,7 +28,8 @@
     "build:all": "npm run build:agent && npm run build:plugin && npm run build",
     "watch": "tsc -b --watch",
     "lint": "eslint .",
-    "test:e2e": "npx vitest run --config vitest.e2e.config.ts"
+    "test:e2e": "npx vitest run --config vitest.e2e.config.ts",
+    "test:perf": "npx vitest run --config vitest.perf.config.ts"
   },
   "author": "Automate The Planet",
   "license": "Apache-2.0",
