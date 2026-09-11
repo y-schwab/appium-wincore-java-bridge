@@ -2,7 +2,7 @@ import type { ExternalDriver, NextPluginCallback } from '@appium/types';
 
 /**
  * `driver.sendCommand` is a server-side method of appium-wincore-driver (its
- * stdin/stdout bridge to DesktopDriverServer.exe), not part of the generic
+ * stdin/stdout bridge to WincoreServer.exe), not part of the generic
  * `ExternalDriver` type — same cast the sibling appium-wincore-uia-bridge-plugin
  * uses. The `injectJavaAgent` server command it reaches is contributed by this
  * package's WincoreJavaBridge.dll tree provider.

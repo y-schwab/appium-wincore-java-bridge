@@ -4,17 +4,17 @@ import { join } from 'node:path';
 import { attachJavaSwing } from './commands.js';
 
 /**
- * The real work of this bridge is a DesktopDriverServer tree-provider plugin
+ * The real work of this bridge is a WincoreServer tree-provider plugin
  * (`native/plugin/WincoreJavaBridge.dll` + `appium-desktop-agent.jar`). It is made
- * discoverable by appending its folder to `DESKTOP_DRIVER_PLUGINS` here, at module
+ * discoverable by appending its folder to `WINCORE_SERVER_PLUGINS` here, at module
  * load — which happens once when Appium boots an enabled plugin, before any session
  * spawns a server, so the server inherits the variable.
  *
  * `__dirname` at runtime is `build/lib/`, so the payload sits three levels up.
  */
 const PLUGIN_NATIVE_DIR = join(__dirname, '..', '..', 'native', 'plugin');
-const existing = process.env.DESKTOP_DRIVER_PLUGINS;
-process.env.DESKTOP_DRIVER_PLUGINS =
+const existing = process.env.WINCORE_SERVER_PLUGINS;
+process.env.WINCORE_SERVER_PLUGINS =
     existing && existing.length > 0 ? `${existing};${PLUGIN_NATIVE_DIR}` : PLUGIN_NATIVE_DIR;
 
 export class JavaBridgePlugin extends BasePlugin {
