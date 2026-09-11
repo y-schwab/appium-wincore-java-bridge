@@ -155,7 +155,7 @@ public class CommandHandler {
             ac = parent.getAccessibleContext();
         }
 
-        if (ac == null) return result;
+        if (ac == null || isCollapsedCombo(ac)) return result;
         int count;
         try {
             count = ac.getAccessibleChildrenCount();
@@ -213,7 +213,7 @@ public class CommandHandler {
                 ? ((Component) node).getAccessibleContext()
                 : ((Accessible) node).getAccessibleContext();
 
-        if (depth < maxDepth && ac != null) {
+        if (depth < maxDepth && ac != null && !isCollapsedCombo(ac)) {
             int count;
             try {
                 count = ac.getAccessibleChildrenCount();
@@ -509,7 +509,7 @@ public class CommandHandler {
     }
 
     private static String findInDirectChildren(AccessibleContext ac, Map<String, Object> condition, ComponentRegistry registry) {
-        if (ac == null) return null;
+        if (ac == null || isCollapsedCombo(ac)) return null;
         int count;
         try {
             count = ac.getAccessibleChildrenCount();
@@ -535,7 +535,7 @@ public class CommandHandler {
     }
 
     private static void collectDirectChildren(AccessibleContext ac, Map<String, Object> condition, ComponentRegistry registry, List<String> results) {
-        if (ac == null) return;
+        if (ac == null || isCollapsedCombo(ac)) return;
         int count;
         try {
             count = ac.getAccessibleChildrenCount();
@@ -573,7 +573,7 @@ public class CommandHandler {
                     : matchesAccessible(selfNode, condition);
             if (matches) return selfId;
         }
-        if (ac == null) return null;
+        if (ac == null || isCollapsedCombo(ac)) return null;
         int count;
         try {
             count = ac.getAccessibleChildrenCount();
@@ -613,7 +613,7 @@ public class CommandHandler {
                     : matchesAccessible(selfNode, condition);
             if (matches) results.add(selfId);
         }
-        if (ac == null) return;
+        if (ac == null || isCollapsedCombo(ac)) return;
         int count;
         try {
             count = ac.getAccessibleChildrenCount();
@@ -637,6 +637,22 @@ public class CommandHandler {
                 logNodeFailure("findAllRecursive.child[" + i + "]", depth, t);
             }
         }
+    }
+
+    /**
+     * Swing's AccessibleJComboBox exposes every popup list item as an accessible child
+     * regardless of whether the popup is actually showing — unlike native UIA controls,
+     * which only report children while expanded. That makes a closed combo box with
+     * hundreds of options cost hundreds of node builds on every tree walk (getPageSource,
+     * findElement, findElements) even though nothing but the current selection is visible.
+     * Skip descending into a combo box's children until it reports AccessibleState.EXPANDED,
+     * matching how a real UIA-native app is traversed; the items become reachable again via
+     * the normal getChildren/findElement/dumpTree paths once the combo is actually open.
+     */
+    private static boolean isCollapsedCombo(AccessibleContext ac) {
+        if (ac.getAccessibleRole() != AccessibleRole.COMBO_BOX) return false;
+        AccessibleStateSet states = ac.getAccessibleStateSet();
+        return states == null || !states.contains(AccessibleState.EXPANDED);
     }
 
     private static void logNodeFailure(String where, int depth, Throwable t) {

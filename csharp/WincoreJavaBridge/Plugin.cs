@@ -17,8 +17,8 @@ internal static class PluginPaths
 
 /// <summary>
 /// Server plugin for the Java Access Bridge (Swing / AWT) agent — loaded by
-/// DesktopDriverServer's PluginLoader from this package's <c>native/plugin/</c>
-/// folder (on <c>DESKTOP_DRIVER_PLUGINS</c>). Contributes the single
+/// WincoreServer's PluginLoader from this package's <c>native/plugin/</c>
+/// folder (on <c>WINCORE_SERVER_PLUGINS</c>). Contributes the single
 /// <c>injectJavaAgent</c> command (reached client-side via
 /// <c>windows: attachJavaSwing</c>) plus a tree provider for the <c>java:</c>
 /// element-id namespace; a Java window's subtree auto-routes into it.

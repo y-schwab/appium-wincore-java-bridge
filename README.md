@@ -15,7 +15,7 @@ childless `Pane`. The controls only exist in the JVM's own accessibility model
 A small agent JAR (`appium-desktop-agent.jar`) is loaded into the target JVM via the Java
 **Attach API** and walks the `AccessibleContext` tree, serving it over a loopback-TCP JSON
 protocol. The driver's server reaches it through a **tree provider** (`ITreeProvider`)
-contributed by this package's DesktopDriverServer plugin
+contributed by this package's WincoreServer plugin
 (`native/plugin/WincoreJavaBridge.dll`).
 
 Once attached, a Java window's subtree is stitched into the normal tree — standard
@@ -30,7 +30,7 @@ appium --use-plugins=wincore-java-bridge
 ```
 
 Requires Appium 3 and `appium-wincore-driver`. The plugin registers its server-side tree
-provider by appending its `native/plugin/` directory to the `DESKTOP_DRIVER_PLUGINS`
+provider by appending its `native/plugin/` directory to the `WINCORE_SERVER_PLUGINS`
 environment variable at load, before any session starts.
 
 ## Usage

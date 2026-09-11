@@ -17,7 +17,7 @@
          must NOT ship in the plugin's output folder. TEMPORARY relative reference
          to the driver checkout's copy — switch to a NuGet PackageReference once
          WincoreServerSdk is published. -->
-    <ProjectReference Include="..\..\..\appium-desktop-driver\csharp\WincoreServerSdk\WincoreServerSdk.csproj">
+    <ProjectReference Include="../../../appium-wincore-driver/csharp/WincoreServerSdk/WincoreServerSdk.csproj">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
