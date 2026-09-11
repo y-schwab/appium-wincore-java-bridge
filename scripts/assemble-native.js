@@ -17,6 +17,19 @@ for (const stray of ['WincoreServerSdk.dll', 'WincoreServerSdk.pdb']) {
     }
 }
 
+// C++ linker byproducts — never loaded at runtime, no reason to ship them.
+const CRUFT = new Set(['.exp', '.lib', '.ilk', '.metagen']);
+for (const dir of [pluginDir, path.join(pluginDir, 'win-x86')]) {
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+        const ext = path.extname(f) === '' && f.endsWith('.dll.metagen') ? '.metagen' : path.extname(f);
+        if (CRUFT.has(ext)) {
+            fs.rmSync(path.join(dir, f));
+            console.log(`removed build byproduct ${path.relative(pluginDir, path.join(dir, f))}`);
+        }
+    }
+}
+
 const manifest = path.join(pluginDir, 'plugin.json');
 if (!fs.existsSync(manifest)) {
     fs.writeFileSync(manifest, JSON.stringify({
