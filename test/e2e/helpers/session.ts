@@ -16,6 +16,8 @@ export const APPIUM_SERVER = {
  */
 export const TEST_APPS_DIR = process.env.TEST_APPS_DIR ?? resolve(process.cwd(), '..', 'appium-wincore-test-apps');
 
+export const NOTEPAD_APP_PATH = 'C:\\Windows\\notepad.exe';
+
 // The Java fixture runs on whatever JDK JAVA_HOME points at (actions/setup-java sets it
 // in CI). Fall back to `javaw` on PATH rather than a hard-coded install dir — a stale
 // absolute path fails with a confusing ENOENT if that JVM was ever removed.
