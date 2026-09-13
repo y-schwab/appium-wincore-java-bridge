@@ -56,6 +56,100 @@ deployments disable it). There is no launch-time `-javaagent` path in this plugi
 need one, set `JAVA_TOOL_OPTIONS=-javaagent:...\appium-desktop-agent.jar` in the environment
 before the app starts.
 
+**Before calling `windows: attachJavaSwing`, the session must be pointed at the Java
+window** — the agent injects into whatever JVM owns the session's current root window,
+regardless of where the session started. Switch first if you began elsewhere:
+
+```js
+// started from app: Root — switch to the Java window before attaching
+const hexHwnd = `0x${parseInt(decimalHwnd, 10).toString(16).padStart(8, '0')}`;
+await driver.switchToWindow(hexHwnd);
+await driver.executeScript('windows: attachJavaSwing', []);
+```
+
+### JDK setup
+
+Injecting into an already-running JVM needs a JDK (not just a JRE) to run the one-shot
+Attach-API loader. Resolved in this order:
+
+1. **`jdkPath` argument** — passed directly to `windows: attachJavaSwing`. Takes priority.
+2. **`JAVA_HOME` environment variable** — fallback when no `jdkPath` is given.
+
+```js
+// per-call override
+await driver.executeScript('windows: attachJavaSwing', [{ jdkPath: 'C:\\Program Files\\Java\\jdk1.8.0_xxx' }]);
+```
+
+```powershell
+# JAVA_HOME — check current value
+[System.Environment]::GetEnvironmentVariable("JAVA_HOME", "Machine")
+
+# set permanently (run as Administrator)
+[System.Environment]::SetEnvironmentVariable(
+  "JAVA_HOME",
+  "C:\Program Files\Java\jdk1.8.0_xxx",
+  "Machine"
+)
+```
+
+For Java 8, the JDK must contain `lib\tools.jar` — if the path points to a JRE, the loader
+scans common JDK sibling directories (`C:\Program Files\Java\jdk*`, Corretto, Zulu)
+automatically before failing. Java 9+ only needs `bin\java.exe` (no `tools.jar`). Tested on
+JDK 8 and JDK 25.
+
+### Locator strategies
+
+All standard locator strategies work against Java elements once attached. In an XPath node
+test, write the **UIA control-type term**, not the Java role — the reflected tree maps each
+role to its UIA equivalent before serving it:
+
+| XPath tag | Java role | Example component |
+| --- | --- | --- |
+| `Edit` | text | `JTextField`, `JTextArea` |
+| `Button` | push button | `JButton` |
+| `CheckBox` | check box | `JCheckBox` |
+| `ComboBox` | combo box | `JComboBox` |
+| `Text` | label | `JLabel` |
+| `List` | list | `JList` |
+| `Tree` | tree | `JTree` |
+| `Table` | table | `JTable` |
+| `RadioButton` | radio button | `JRadioButton` |
+| `MenuItem` | menu item | `JMenuItem` |
+| `Slider` | slider | `JSlider` |
+| `TabItem` | page tab | tab in `JTabbedPane` |
+
+A role with no UIA equivalent (`root pane`, `glass pane`, `filler`, …) keeps its role name in
+PascalCase: `//RootPane`, `//GlassPane`. Node tests are **PascalCase and case-sensitive** —
+`//pushbutton` matches nothing. Use `//*[@attr=…]` when unsure of the tag; `getPageSource`
+prints the same tag names, so a tag copied from page source is a valid node test as-is.
+
+```js
+// by accessible name (set via setAccessibleName() in app code)
+await driver.$('~usernameField')
+
+// by XPath role + name attribute
+await driver.$('//Edit[@Name="usernameField"]')
+
+// by Java class name — works even when no accessible name is set
+await driver.$('//*[@JavaSimpleClass="HrIDTextField"]')
+await driver.$('//*[@JavaClass="com.example.HrIDTextField"]')
+```
+
+Every Java element also exposes two extra XPath-predicate attributes, unique per component
+type and stable across layout changes — the most reliable locator for legacy apps that never
+call `setAccessibleName()`:
+
+| Attribute | Value | Example |
+| --- | --- | --- |
+| `JavaClass` | Fully-qualified class name | `javax.swing.JTextField` |
+| `JavaSimpleClass` | Simple class name | `JTextField` |
+
+### Window switching
+
+Switching to a non-Java window mid-session uses normal UIA. The driver detects Java windows
+by Win32 class name (`SunAwtFrame` etc.) and routes each find call to the correct engine
+automatically once attached.
+
 ## Build from source
 
 ```bash
@@ -65,6 +159,7 @@ npm run build:all      # javac the agent (needs a JDK on PATH), publish the plug
 
 ## Contract
 
-The plugin DLL compiles against `WincoreServerSdk` (`ITreeProvider`, `IServerPlugin`). While
-the contract is still stabilising this is a relative project reference to a sibling
-`appium-wincore-driver` checkout; it moves to a published NuGet package once stable.
+The plugin DLL compiles against [`WincoreServerSdk`](https://www.nuget.org/packages/WincoreServerSdk)
+(`ITreeProvider`, `IServerPlugin`) via a `PackageReference`. `PluginLoader` refuses to load a
+plugin whose declared SDK major version doesn't match the host's — see the driver's
+[server plugin architecture](https://github.com/y-schwab/appium-wincore-driver#readme) docs.
