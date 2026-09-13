@@ -38,7 +38,7 @@
     "url": "https://github.com/y-schwab/appium-wincore-java-bridge.git"
   },
   "peerDependencies": {
-    "appium": "^3.0.0-rc.2"
+    "appium": "^3.0.0"
   },
   "dependencies": {
     "@appium/base-plugin": "^3.3.3"
@@ -52,7 +52,7 @@
     "@appium/tsconfig": "^1.1.0",
     "@appium/types": "^1.1.0",
     "@types/node": "^24.8.1",
-    "appium": "^3.0.0-rc.2",
+    "appium": "^3.7.0",
     "eslint": "^9.38.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1",
