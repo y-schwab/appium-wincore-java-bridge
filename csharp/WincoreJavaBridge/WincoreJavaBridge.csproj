@@ -14,13 +14,11 @@
   <ItemGroup>
     <!-- Plugin contract. Resolved at runtime to the host's already-loaded copy
          (PluginLoadContext pins "WincoreServerSdk" to the default context), so it
-         must NOT ship in the plugin's output folder. TEMPORARY relative reference
-         to the driver checkout's copy — switch to a NuGet PackageReference once
-         WincoreServerSdk is published. -->
-    <ProjectReference Include="../../../appium-wincore-driver/csharp/WincoreServerSdk/WincoreServerSdk.csproj">
+         must NOT ship in the plugin's output folder. -->
+    <PackageReference Include="WincoreServerSdk" Version="1.0.0">
       <Private>false</Private>
       <ExcludeAssets>runtime</ExcludeAssets>
-    </ProjectReference>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
